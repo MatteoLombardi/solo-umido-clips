@@ -77,8 +77,6 @@ export class ClipsComponent implements OnInit, AfterViewInit {
         uploadTime: new Date(clip.created_at),
         game: gameMap[clip.game_id] || 'Unknown', // Map game_id to game name
       }));
-
-      console.log('Mapped Videos with Game Names:', this.videos);
     }).catch((error) => {
       console.error('Error fetching Twitch clips:', error);
     });
@@ -97,7 +95,6 @@ export class ClipsComponent implements OnInit, AfterViewInit {
     this.clipsService.getAvailableGames().then((games) => {
       this.availableGames = games;
       this.filteredGames = games; // Initialize filtered games
-      console.log('Available Games:', this.availableGames);
     }).catch((error) => {
       console.error('Error fetching available games:', error);
     });
@@ -132,7 +129,6 @@ export class ClipsComponent implements OnInit, AfterViewInit {
         uploadTime: new Date(clip.created_at),
         game: clip.game_name || 'Unknown',
       }));
-      console.log('Fetched Clips for Game:', this.videos);
     }).catch((error) => {
       console.error('Error fetching clips for game:', error);
     });
@@ -172,7 +168,6 @@ export class ClipsComponent implements OnInit, AfterViewInit {
 
         // Listen for the "ENDED" event to play the next clip
         this.player.addEventListener(Twitch.Player.ENDED, () => {
-          console.log('Clip ended, playing next clip...');
           this.playNextClip();
         });
       }, 0); // Delay to ensure the DOM is updated
@@ -218,26 +213,32 @@ export class ClipsComponent implements OnInit, AfterViewInit {
   onGameSelected(event: { game: any; broadcasterId: string }): void {
     const { game, broadcasterId } = event;
     this.selectedGameId = game.id; // Store the selected game ID
-    console.log('Selected Game:', game, 'Broadcaster ID:', broadcasterId);
 
-    // Fetch clips for the selected game and broadcaster
-    this.clipsService.getClipsByGameAndBroadcaster(game.id, broadcasterId).then((clips) => {
+    // Fetch clips for the broadcaster
+    this.clipsService.getClipsByBroadcaster(broadcasterId).then((clips) => {
       if (clips && clips.length > 0) {
-        this.videos = clips.map((clip: any) => ({
-          embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
-          title: clip.title,
-          author: clip.creator_name,
-          uploadTime: new Date(clip.created_at),
-          game: game.name, // Use the selected game's name
-        }));
-        this.currentVideoIndex = 0; // Reset to the first clip
-        console.log('Updated Clips:', this.videos);
+        // Filter clips by the selected game ID
+        const filteredClips = clips.filter((clip: any) => clip.game_id === this.selectedGameId);
+
+        if (filteredClips.length > 0) {
+          this.videos = filteredClips.map((clip: any) => ({
+            embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+            title: clip.title,
+            author: clip.creator_name,
+            uploadTime: new Date(clip.created_at),
+            game: game.name, // Use the selected game's name
+          }));
+          this.currentVideoIndex = 0; // Reset to the first clip
+        } else {
+          console.warn('No clips found for the selected game.');
+          this.videos = []; // Clear the videos if no clips are found
+        }
       } else {
-        console.warn('No clips found for the selected game and broadcaster.');
+        console.warn('No clips found for the broadcaster.');
         this.videos = []; // Clear the videos if no clips are found
       }
     }).catch((error) => {
-      console.error('Error fetching clips for the selected game and broadcaster:', error);
+      console.error('Error fetching clips for the broadcaster:', error);
     });
   }
 }

@@ -127,4 +127,21 @@ export class ClipsService {
     const response: any = await firstValueFrom(this.http.get(this.clipsUrl, { headers, params }));
     return response.data || []; // Return the clips or an empty array if none are found
   }
+
+  async getClipsByBroadcaster(broadcasterId: string, first: number = 10): Promise<any[]> {
+    const token = await this.getToken(); // Acquire the access token
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Client-Id': this.clientId,
+    });
+
+    const params = {
+      broadcaster_id: broadcasterId, // Fetch clips for the broadcaster
+      first: first.toString(), // Number of clips to fetch
+    };
+
+    const response: any = await firstValueFrom(this.http.get(this.clipsUrl, { headers, params }));
+    return response.data || []; // Return the clips or an empty array if none are found
+  }
 }

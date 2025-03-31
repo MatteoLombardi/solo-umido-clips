@@ -37,7 +37,7 @@ export class GameFilterComponent {
 
   submitFilter(): void {
     if (this.selectedGame && this.broadcasterId) {
-      this.gameSelected.emit({ game: this.selectedGame, broadcasterId: this.broadcasterId }); // Emit the selected game and broadcaster ID to the parent component
+      this.gameSelected.emit({ game: this.selectedGame, broadcasterId: this.broadcasterId });
     }
   }
 }
