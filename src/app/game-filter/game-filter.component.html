@@ -1,0 +1,30 @@
+<div class="game-filter">
+  <label for="game-input" class="game-filter-label">Seleziona un gioco:</label>
+  <input
+    id="game-input"
+    type="text"
+    [(ngModel)]="gameFilter"
+    (input)="filterGames()"
+    placeholder="Cerca un gioco..."
+    class="game-input"
+  />
+  <ul class="game-list" *ngIf="filteredGames.length > 0">
+    <li
+      *ngFor="let game of filteredGames"
+      (click)="selectGame(game)"
+      class="game-item"
+    >
+      {{ game.name }}
+    </li>
+  </ul>
+  <p class="no-games-message" *ngIf="filteredGames.length === 0">
+    Nessun gioco trovato.
+  </p>
+  <button
+    class="submit-filter-button"
+    (click)="submitFilter()"
+    [disabled]="!selectedGame"
+  >
+    Conferma Gioco
+  </button>
+</div>

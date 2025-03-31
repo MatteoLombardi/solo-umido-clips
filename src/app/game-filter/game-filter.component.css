@@ -1,0 +1,95 @@
+/* Game filter container */
+.game-filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  
+  /* Label for the game filter */
+  .game-filter-label {
+    color: var(--twitch-light);
+    font-size: 1rem;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  /* Input field for filtering games */
+  .game-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid var(--twitch-purple);
+    border-radius: 5px;
+    background-color: var(--twitch-dark);
+    color: var(--twitch-light);
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+  
+  /* Dropdown list for filtered games */
+  .game-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: var(--twitch-dark);
+    border: 1px solid var(--twitch-purple);
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Individual game items in the dropdown */
+  .game-item {
+    padding: 10px;
+    color: var(--twitch-light);
+    cursor: pointer;
+    font-family: 'Roboto', Arial, sans-serif;
+    transition: background-color 0.2s ease;
+  }
+  
+  .game-item:hover {
+    background-color: var(--twitch-hover-purple);
+  }
+  
+  /* No games message */
+  .no-games-message {
+    padding: 10px;
+    color: #b3b3b3;
+    text-align: center;
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+
+  /* Submit filter button */
+  .submit-filter-button {
+    background-color: var(--twitch-purple);
+    color: var(--twitch-light);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin-top: 10px;
+  }
+
+  .submit-filter-button:hover {
+    background-color: var(--twitch-hover-purple);
+  }
+
+  .submit-filter-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }

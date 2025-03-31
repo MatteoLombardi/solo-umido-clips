@@ -1,61 +1,224 @@
-/* Center the video player and content */
-div {
+/* Import the Roboto font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* General Twitch theme colors */
+:root {
+  --twitch-purple: #9146ff;
+  --twitch-dark: #0e0e10;
+  --twitch-light: #ffffff;
+  --twitch-gray: #e0e0e0;
+  --twitch-hover-purple: #772ce8;
+  --twitch-darker-purple: #5b1dbf;
+}
+
+/* Set the global background color and font for the page */
+html, body {
+  background-color: var(--twitch-dark); /* Dark background */
+  color: var(--twitch-light); /* Light text for contrast */
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', Arial, sans-serif; /* Use Roboto as the default font */
+  height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Page title */
+.page-title {
+  color: var(--twitch-purple);
+  font-family: 'Roboto', Arial, sans-serif;
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Game filter container */
+.game-filter {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin: 20px;
-  font-family: Arial, sans-serif;
-  color: #333;
-}
-
-/* Style the video player */
-video {
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: 15px;
-}
-
-/* Style the text content */
-p {
-  margin: 5px 0;
-  font-size: 16px;
-  text-align: center;
-}
-
-/* Highlight the "Now playing" text */
-p:first-of-type {
-  font-weight: bold;
-  font-size: 18px;
-  color: #007acc;
-}
-
-/* Style the "No videos available" message */
-ng-template p {
-  font-size: 18px;
-  color: #ff0000;
-  text-align: center;
-}
-
-/* Style for the page title */
-.page-title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: bold;
-  color: #007acc;
   margin-bottom: 20px;
-  font-family: 'Arial', sans-serif;
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Limit the width for better alignment */
+  padding: 0 10px; /* Add padding for smaller screens */
+  box-sizing: border-box; /* Ensure padding doesn't break layout */
 }
 
-/* Add responsiveness for smaller screens */
+/* Label for the game filter */
+.game-filter-label {
+  color: var(--twitch-light);
+  font-size: 1rem;
+  font-family: 'Roboto', Arial, sans-serif;
+  margin-bottom: 10px;
+  text-align: center; /* Center the label */
+}
+
+/* Input field for filtering games */
+.game-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid var(--twitch-purple);
+  border-radius: 5px;
+  background-color: var(--twitch-dark);
+  color: var(--twitch-light);
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+/* Dropdown list for filtered games */
+.game-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: var(--twitch-dark);
+  border: 1px solid var(--twitch-purple);
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%; /* Position below the input field */
+  width: 100%;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+}
+
+/* Individual game items in the dropdown */
+.game-item {
+  padding: 10px;
+  color: var(--twitch-light);
+  cursor: pointer;
+  font-family: 'Roboto', Arial, sans-serif;
+  transition: background-color 0.2s ease;
+}
+
+.game-item:hover {
+  background-color: var(--twitch-hover-purple);
+}
+
+/* Twitch container */
+.twitch-container {
+  background-color: var(--twitch-dark);
+  color: var(--twitch-light);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  font-family: 'Roboto', Arial, sans-serif;
+  width: 100%; /* Ensure it scales properly */
+  box-sizing: border-box;
+}
+
+/* Twitch player */
+.twitch-player {
+  width: 100%;
+  height: 360px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 2px solid var(--twitch-purple);
+}
+
+/* Clip info */
+.clip-info p {
+  font-family: 'Roboto', Arial, sans-serif;
+  margin: 10px 0;
+}
+
+.author-name {
+  font-weight: bold;
+  color: var(--twitch-purple);
+}
+
+.game-name {
+  font-weight: bold;
+  color: var(--twitch-gray);
+}
+
+/* Buttons */
+button {
+  background-color: var(--twitch-purple);
+  color: var(--twitch-light);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+button:hover {
+  background-color: var(--twitch-hover-purple);
+}
+
+button:active {
+  background-color: var(--twitch-darker-purple);
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
-  video {
-    width: 100%;
-    height: auto;
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 15px;
   }
 
-  p {
+  .game-filter {
+    max-width: 100%; /* Allow the filter to take full width */
+    padding: 0 15px;
+  }
+
+  .game-input {
     font-size: 14px;
+    padding: 8px;
+  }
+
+  .game-list {
+    max-height: 150px; /* Reduce height for smaller screens */
+  }
+
+  .twitch-container {
+    padding: 15px;
+    max-width: 100%; /* Allow the container to take full width */
+  }
+
+  .twitch-player {
+    height: 240px; /* Reduce player height for smaller screens */
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+
+  .game-input {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .twitch-player {
+    height: 200px; /* Further reduce player height for very small screens */
+  }
+
+  .clip-info p {
+    font-size: 14px; /* Reduce font size for clip info */
   }
 }

@@ -1,24 +1,34 @@
 <h1 class="page-title">Solo Umido Clips</h1>
 
-<div *ngIf="videos.length > 0; else noVideos">
-  <video
-    #videoPlayer
-    width="640"
-    height="360"
-    controls
-    autoplay
-    (ended)="playNextVideo(videoPlayer)"
-  >
-    <source [src]="videos[currentVideoIndex].videoUrl" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-  <p>Now playing: {{ videos[currentVideoIndex].title }}</p>
-  <p>
-    Clippato da: {{ videos[currentVideoIndex].author }} il
-    {{ videos[currentVideoIndex].uploadTime | date: 'dd MMMM yyyy':'it-IT' }}
-  </p>
+<app-game-filter
+  [availableGames]="availableGames"
+  [broadcasterId]="'177887601'"
+  (gameSelected)="onGameSelected($event)"
+></app-game-filter>
+
+<div class="twitch-container" *ngIf="videos.length > 0; else noVideos">
+  <iframe
+    [src]="videos[currentVideoIndex]?.embedUrl | safeUrl"
+    class="twitch-player"
+    frameborder="0"
+    allowfullscreen
+    scrolling="no"
+  ></iframe>
+  <div class="clip-info">
+    <p><strong>Nome clip:</strong> {{ videos[currentVideoIndex]?.title }}</p>
+    <p>
+      <strong>Clippato da:</strong>
+      <span class="author-name">{{ videos[currentVideoIndex]?.author || 'Unknown' }}</span>
+      il {{ videos[currentVideoIndex]?.uploadTime | date: 'dd MMMM yyyy':'it-IT' }}
+    </p>
+    <p>
+      <strong>Gioco:</strong>
+      <span class="game-name">{{ videos[currentVideoIndex]?.game || 'Unknown' }}</span>
+    </p>
+  </div>
+  <button class="next-clip-button" (click)="playNextClip()">Prossima Clip</button>
 </div>
 
 <ng-template #noVideos>
-  <p>No videos available to play.</p>
+  <p class="no-videos-message">Non ci sono clip disponibili da riprodurre.</p>
 </ng-template>

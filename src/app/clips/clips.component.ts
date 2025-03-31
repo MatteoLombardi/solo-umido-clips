@@ -1,49 +1,243 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { ClipsService } from './clips.service';
+import { SafeUrlPipe } from '../shared/safe-url.pipe';
+import { GameFilterComponent } from '../game-filter/game-filter.component'; // Import the standalone component
+
+declare const Twitch: any; // Declare Twitch as a global variable
 
 @Component({
   selector: 'app-clips',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, SafeUrlPipe, GameFilterComponent], // Import GameFilterComponent
   templateUrl: './clips.component.html',
-  styleUrl: './clips.component.css'
+  styleUrls: ['./clips.component.css'], // Corrected styleUrls property
+  providers: [ClipsService],
 })
-export class ClipsComponent implements OnInit {
+export class ClipsComponent implements OnInit, AfterViewInit {
   videos: any[] = [];
   currentVideoIndex = 0;
+  player: any; // Reference to the Twitch player
+  availableGames: any[] = []; // List of all available games
+  filteredGames: any[] = []; // Filtered list of games
+  gameFilter: string = ''; // Input value for filtering games
+  selectedGameId: string = ''; // ID of the selected game
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private clipsService: ClipsService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit(): void {
-    this.fetchTwitchClips();
-  }
-
-  fetchTwitchClips(): void {
-    const apiUrl =
-      'https://gist.githubusercontent.com/poudyalanil/ca84582cbeb4fc123a13290a586da925/raw/14a27bd0bcd0cd323b35ad79cf3b493dddf6216b/videos.json'; // Replace with your API endpoint
-    this.http.get<any[]>(apiUrl).subscribe({
-      next: (videos) => {
-        this.videos = videos.map((video) => ({
-          ...video,
-          uploadTime: new Date(video.uploadTime) // Parse uploadTime as a Date object
-        }));
-        console.log('Fetched video links:', this.videos);
-      },
-      error: (err) => {
-        console.error('Error fetching video links:', err);
-      }
+    this.loadTwitchScript().then(() => {
+      this.fetchAvailableGames(); // Fetch the list of available games
+      this.fetchTwitchClips(); // Fetch default clips
+    }).catch((error) => {
+      console.error('Error loading Twitch script:', error);
     });
   }
 
-  playNextVideo(videoPlayer: HTMLVideoElement): void {
+  ngAfterViewInit(): void {
+    this.initializePlayer();
+  }
+
+  fetchTwitchClips(): void {
+    const broadcasterId = '177887601'; // Replace with the actual broadcaster ID
+    const numberOfClips = 30; // Number of clips to fetch
+
+    this.clipsService.getClips(broadcasterId, numberOfClips).then(async (response) => {
+      let clips = response.data;
+
+      if (!clips || clips.length === 0) {
+        console.warn('No clips found.');
+        return;
+      }
+
+      // Shuffle the clips
+      clips = this.shuffleArray(clips);
+
+      // Extract unique game IDs from the clips
+      const gameIds = [...new Set(clips.map((clip: any) => clip.game_id))] as string[];
+
+      // Fetch game names using the game IDs
+      const games = await this.clipsService.getGames(gameIds as string[]);
+
+      // Map game IDs to game names
+      const gameMap = games.reduce((map: any, game: any) => {
+        map[game.id] = game.name;
+        return map;
+      }, {});
+
+      // Map clips to include game names
+      this.videos = clips.map((clip: any) => ({
+        embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+        title: clip.title,
+        author: clip.creator_name,
+        uploadTime: new Date(clip.created_at),
+        game: gameMap[clip.game_id] || 'Unknown', // Map game_id to game name
+      }));
+
+      console.log('Mapped Videos with Game Names:', this.videos);
+    }).catch((error) => {
+      console.error('Error fetching Twitch clips:', error);
+    });
+  }
+
+  // Helper function to shuffle an array
+  private shuffleArray(array: any[]): any[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+    return array;
+  }
+
+  fetchAvailableGames(): void {
+    this.clipsService.getAvailableGames().then((games) => {
+      this.availableGames = games;
+      this.filteredGames = games; // Initialize filtered games
+      console.log('Available Games:', this.availableGames);
+    }).catch((error) => {
+      console.error('Error fetching available games:', error);
+    });
+  }
+
+  filterGames(): void {
+    const filter = this.gameFilter.toLowerCase();
+    this.filteredGames = this.availableGames.filter((game) =>
+      game.name.toLowerCase().includes(filter)
+    );
+  }
+
+  selectGame(game: any): void {
+    this.selectedGameId = game.id;
+    this.gameFilter = game.name; // Set the input value to the selected game name
+    this.filteredGames = []; // Hide the dropdown after selection
+  }
+
+  fetchClipsForGame(): void {
+    if (!this.selectedGameId) {
+      console.warn('No game selected.');
+      return;
+    }
+
+    const broadcasterId = '177887601'; // Replace with the actual broadcaster ID
+
+    this.clipsService.getClipsForGame(broadcasterId, this.selectedGameId).then((response) => {
+      this.videos = response.data.map((clip: any) => ({
+        embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+        title: clip.title,
+        author: clip.creator_name,
+        uploadTime: new Date(clip.created_at),
+        game: clip.game_name || 'Unknown',
+      }));
+      console.log('Fetched Clips for Game:', this.videos);
+    }).catch((error) => {
+      console.error('Error fetching clips for game:', error);
+    });
+  }
+
+  initializePlayer(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      console.warn('Player initialization skipped because it is not running in the browser.');
+      return;
+    }
+
+    if (this.videos.length > 0) {
+      const embedUrl = this.videos[this.currentVideoIndex]?.embedUrl;
+
+      // Extract the clip slug from the embed URL
+      const clipSlug = this.extractClipSlug(embedUrl);
+
+      if (!clipSlug) {
+        console.error('Clip slug is missing or invalid.');
+        return;
+      }
+
+      // Destroy the existing player if it exists
+      if (this.player) {
+        this.player.removeEventListener(Twitch.Player.ENDED, this.playNextClip.bind(this));
+        this.player.destroy();
+      }
+
+      // Ensure the DOM element exists before initializing the player
+      setTimeout(() => {
+        this.player = new Twitch.Player('twitch-player', {
+          width: 640,
+          height: 360,
+          clip: clipSlug, // Use the clip slug for Twitch clips
+          parent: ['localhost'], // Replace with your actual domain
+        });
+
+        // Listen for the "ENDED" event to play the next clip
+        this.player.addEventListener(Twitch.Player.ENDED, () => {
+          console.log('Clip ended, playing next clip...');
+          this.playNextClip();
+        });
+      }, 0); // Delay to ensure the DOM is updated
+    }
+  }
+
+  extractClipSlug(embedUrl: string): string {
+    const url = new URL(embedUrl);
+    const clipSlug = url.pathname.split('/').pop(); // Extract the last part of the URL
+    return clipSlug || '';
+  }
+
+  playNextClip(): void {
     if (this.currentVideoIndex < this.videos.length - 1) {
       this.currentVideoIndex++;
-      videoPlayer.src = this.videos[this.currentVideoIndex].videoUrl;
-      videoPlayer.load();
-      videoPlayer.play();
     } else {
-      console.log('No more videos to play.');
+      console.log('No more clips to play.');
     }
+  }
+
+  loadTwitchScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!isPlatformBrowser(this.platformId)) {
+        console.warn('Twitch script loading skipped because it is not running in the browser.');
+        resolve();
+        return;
+      }
+
+      if (typeof Twitch !== 'undefined') {
+        resolve(); // Script is already loaded
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://embed.twitch.tv/embed/v1.js';
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Twitch Embed Player script.'));
+      document.head.appendChild(script);
+    });
+  }
+
+  onGameSelected(event: { game: any; broadcasterId: string }): void {
+    const { game, broadcasterId } = event;
+    this.selectedGameId = game.id; // Store the selected game ID
+    console.log('Selected Game:', game, 'Broadcaster ID:', broadcasterId);
+
+    // Fetch clips for the selected game and broadcaster
+    this.clipsService.getClipsByGameAndBroadcaster(game.id, broadcasterId).then((clips) => {
+      if (clips && clips.length > 0) {
+        this.videos = clips.map((clip: any) => ({
+          embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+          title: clip.title,
+          author: clip.creator_name,
+          uploadTime: new Date(clip.created_at),
+          game: game.name, // Use the selected game's name
+        }));
+        this.currentVideoIndex = 0; // Reset to the first clip
+        console.log('Updated Clips:', this.videos);
+      } else {
+        console.warn('No clips found for the selected game and broadcaster.');
+        this.videos = []; // Clear the videos if no clips are found
+      }
+    }).catch((error) => {
+      console.error('Error fetching clips for the selected game and broadcaster:', error);
+    });
   }
 }
