@@ -1,0 +1,61 @@
+/* Center the video player and content */
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+/* Style the video player */
+video {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+}
+
+/* Style the text content */
+p {
+  margin: 5px 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Highlight the "Now playing" text */
+p:first-of-type {
+  font-weight: bold;
+  font-size: 18px;
+  color: #007acc;
+}
+
+/* Style the "No videos available" message */
+ng-template p {
+  font-size: 18px;
+  color: #ff0000;
+  text-align: center;
+}
+
+/* Style for the page title */
+.page-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #007acc;
+  margin-bottom: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Add responsiveness for smaller screens */
+@media (max-width: 768px) {
+  video {
+    width: 100%;
+    height: auto;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}

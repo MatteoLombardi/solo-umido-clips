@@ -1,0 +1,24 @@
+<h1 class="page-title">Solo Umido Clips</h1>
+
+<div *ngIf="videos.length > 0; else noVideos">
+  <video
+    #videoPlayer
+    width="640"
+    height="360"
+    controls
+    autoplay
+    (ended)="playNextVideo(videoPlayer)"
+  >
+    <source [src]="videos[currentVideoIndex].videoUrl" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  <p>Now playing: {{ videos[currentVideoIndex].title }}</p>
+  <p>
+    Clippato da: {{ videos[currentVideoIndex].author }} il
+    {{ videos[currentVideoIndex].uploadTime | date: 'dd MMMM yyyy':'it-IT' }}
+  </p>
+</div>
+
+<ng-template #noVideos>
+  <p>No videos available to play.</p>
+</ng-template>
