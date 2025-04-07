@@ -13,8 +13,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/solo-umido-clips",
+            "outputPath": "docs",
             "index": "src/index.html",
+            "baseHref": "/solo-umido-clips/",
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
@@ -44,8 +45,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "20kb",
+                  "maximumError": "25kb"
                 }
               ],
               "outputHashing": "all"

@@ -17,7 +17,7 @@ html, body {
   color: var(--twitch-light); /* Light text for contrast */
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', Arial, sans-serif; /* Use Roboto as the default font */
+  font-family: 'Roboto', sans-serif; /* Use Roboto as the default font */
   height: 100%;
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
