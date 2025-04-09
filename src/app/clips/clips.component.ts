@@ -71,7 +71,7 @@ export class ClipsComponent implements OnInit, AfterViewInit {
 
       // Map clips to include game names
       this.videos = clips.map((clip: any) => ({
-        embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+        embedUrl: `${clip.embed_url}&parent=matteolombardi.github.io`, // Replace 'localhost' with your actual domain
         title: clip.title,
         author: clip.creator_name,
         uploadTime: new Date(clip.created_at),
@@ -123,7 +123,7 @@ export class ClipsComponent implements OnInit, AfterViewInit {
 
     this.clipsService.getClipsForGame(broadcasterId, this.selectedGameId).then((response) => {
       this.videos = response.data.map((clip: any) => ({
-        embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+        embedUrl: `${clip.embed_url}&parent=matteolombardi.github.io`, // Replace 'localhost' with your actual domain
         title: clip.title,
         author: clip.creator_name,
         uploadTime: new Date(clip.created_at),
@@ -163,7 +163,7 @@ export class ClipsComponent implements OnInit, AfterViewInit {
           width: 640,
           height: 360,
           clip: clipSlug, // Use the clip slug for Twitch clips
-          parent: ['localhost'], // Replace with your actual domain
+          parent: ['matteolombardi.github.io'], // Replace with your actual domain
         });
 
         // Listen for the "ENDED" event to play the next clip
@@ -222,7 +222,7 @@ export class ClipsComponent implements OnInit, AfterViewInit {
 
         if (filteredClips.length > 0) {
           this.videos = filteredClips.map((clip: any) => ({
-            embedUrl: `${clip.embed_url}&parent=localhost`, // Replace 'localhost' with your actual domain
+            embedUrl: `${clip.embed_url}&parent=matteolombardi.github.io`, // Replace 'localhost' with your actual domain
             title: clip.title,
             author: clip.creator_name,
             uploadTime: new Date(clip.created_at),
