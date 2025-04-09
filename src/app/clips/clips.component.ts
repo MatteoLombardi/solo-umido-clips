@@ -218,9 +218,12 @@ export class ClipsComponent implements OnInit, AfterViewInit {
     this.clipsService.getClipsByBroadcaster(broadcasterId).then((clips) => {
       if (clips && clips.length > 0) {
         // Filter clips by the selected game ID
-        const filteredClips = clips.filter((clip: any) => clip.game_id === this.selectedGameId);
+        let filteredClips = clips.filter((clip: any) => clip.game_id === this.selectedGameId);
 
         if (filteredClips.length > 0) {
+          // Shuffle the filtered clips
+          filteredClips = this.shuffleArray(filteredClips);
+
           this.videos = filteredClips.map((clip: any) => ({
             embedUrl: `${clip.embed_url}&parent=matteolombardi.github.io`, // Replace 'localhost' with your actual domain
             title: clip.title,
